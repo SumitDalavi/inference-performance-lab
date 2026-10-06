@@ -30,3 +30,4 @@ Runs controlled experiments against an OpenAI-compatible inference server (vLLM 
 
 ## Docs
 [Architecture](docs/ARCHITECTURE.md) | [Plan](docs/IMPLEMENTATION_PLAN.md) | [Work packages](docs/WORK_PACKAGES.md) | [Risks](docs/RISKS.md) | [Evaluation/methodology](docs/EVALUATION.md) | [Demo](docs/DEMO_SCRIPT.md) | [Decisions](docs/DECISIONS.md) | [GPU access guide](docs/GPU_ACCESS.md)
+
