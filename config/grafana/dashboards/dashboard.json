@@ -1,0 +1,72 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "custom": {} }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "id": 2,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        { "expr": "rate(llm_requests_total[1m])", "legendFormat": "{{status}}", "refId": "A" }
+      ],
+      "title": "Request Rate (RPS)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "custom": {} }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+      "id": 3,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(llm_e2e_seconds_bucket[1m])) by (le))", "legendFormat": "p95 E2E", "refId": "A" },
+        { "expr": "histogram_quantile(0.50, sum(rate(llm_e2e_seconds_bucket[1m])) by (le))", "legendFormat": "p50 E2E", "refId": "B" }
+      ],
+      "title": "End-to-End Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "custom": {} }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 },
+      "id": 4,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(llm_ttft_seconds_bucket[1m])) by (le))", "legendFormat": "p95 TTFT", "refId": "A" }
+      ],
+      "title": "Time to First Token (TTFT)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": { "custom": {} }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 9 },
+      "id": 5,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(llm_itl_seconds_bucket[1m])) by (le))", "legendFormat": "p95 ITL", "refId": "A" },
+        { "expr": "histogram_quantile(0.95, sum(rate(llm_tpot_seconds_bucket[1m])) by (le))", "legendFormat": "p95 TPOT", "refId": "B" }
+      ],
+      "title": "Inter-Token Latency & TPOT",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "LLM Inference Performance",
+  "uid": "llm-perf-01",
+  "version": 1
+}

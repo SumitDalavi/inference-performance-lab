@@ -30,5 +30,5 @@ app = web.Application()
 app.router.add_post('/v1/chat/completions', stream_handler)
 
 if __name__ == '__main__':
-    print("Starting Mock VLLM Streaming Server on port 8080...")
-    web.run_app(app, port=8080)
+    print("Starting Mock VLLM Streaming Server on port 8081...")
+    web.run_app(app, port=8081)

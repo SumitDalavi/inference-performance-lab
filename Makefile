@@ -8,3 +8,5 @@ dev:
 	docker compose up -d
 	uv run python mock_server.py &
 	uv run python benchmark.py --config config/test.yaml
+test:
+	node test.js

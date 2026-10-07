@@ -16,10 +16,10 @@ TPOT = Histogram('llm_tpot_seconds', 'Time Per Output Token', buckets=[0.01, 0.0
 
 results_log = []
 
-async def make_request(session, url, prompt, auth_headers):
+async def make_request(session, url, prompt, auth_headers, model):
     start_time = time.monotonic()
     payload = {
-        "model": "facebook/opt-125m",
+        "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": True,
         "max_tokens": 100
@@ -28,12 +28,15 @@ async def make_request(session, url, prompt, auth_headers):
     try:
         async with session.post(url, json=payload, headers=auth_headers, timeout=aiohttp.ClientTimeout(total=60)) as response:
             if response.status != 200:
-                print(f"Error {response.status}: {await response.text()}")
+                text = await response.text()
+                print(f"Error {response.status}: {text}")
                 REQUESTS.labels(status='error').inc()
+                results_log.append({"success": False, "error": f"HTTP {response.status}: {text}"})
                 return
 
             first_chunk_time = None
             last_chunk_time = None
+            chunk_count = 0
             token_count = 0
             
             async for line in response.content:
@@ -47,7 +50,7 @@ async def make_request(session, url, prompt, auth_headers):
                         data = json.loads(line[6:])
                         choices = data.get('choices', [])
                         if choices and choices[0].get('delta', {}).get('content'):
-                            token_count += 1
+                            chunk_count += 1
                             now = time.monotonic()
                             if first_chunk_time is None:
                                 first_chunk_time = now
@@ -55,12 +58,21 @@ async def make_request(session, url, prompt, auth_headers):
                             else:
                                 ITL.observe(now - last_chunk_time)
                             last_chunk_time = now
+                        
+                        usage = data.get('usage')
+                        if usage and usage.get('completion_tokens'):
+                            token_count = usage.get('completion_tokens')
                     except json.JSONDecodeError:
                         pass
             
+            if token_count == 0:
+                token_count = chunk_count
+
             end_time = time.monotonic()
             e2e = end_time - start_time
             E2E_LATENCY.observe(e2e)
+            
+            tpot = 0
             if token_count > 0:
                 tpot = (end_time - first_chunk_time) / token_count if first_chunk_time else 0
                 TPOT.observe(tpot)
@@ -68,8 +80,10 @@ async def make_request(session, url, prompt, auth_headers):
             REQUESTS.labels(status='success').inc()
             results_log.append({
                 "prompt_length": len(prompt),
+                "chunks": chunk_count,
                 "tokens": token_count,
                 "ttft": (first_chunk_time - start_time) if first_chunk_time else 0,
+                "tpot": tpot,
                 "e2e": e2e,
                 "success": True
             })
@@ -78,25 +92,25 @@ async def make_request(session, url, prompt, auth_headers):
         print(f"Request failed: {e}")
         results_log.append({"success": False, "error": str(e)})
 
-async def closed_loop(session, url, prompts, concurrency, duration, auth_headers):
+async def closed_loop(session, url, prompts, concurrency, duration, auth_headers, model):
     end_time = time.monotonic() + duration
     
     async def worker():
         while time.monotonic() < end_time:
             prompt = random.choice(prompts)
-            await make_request(session, url, prompt, auth_headers)
+            await make_request(session, url, prompt, auth_headers, model)
             
     workers = [worker() for _ in range(concurrency)]
     await asyncio.gather(*workers)
 
-async def open_loop(session, url, prompts, target_rps, duration, auth_headers):
+async def open_loop(session, url, prompts, target_rps, duration, auth_headers, model):
     end_time = time.monotonic() + duration
     interval = 1.0 / target_rps
     
     tasks = []
     while time.monotonic() < end_time:
         prompt = random.choice(prompts)
-        tasks.append(asyncio.create_task(make_request(session, url, prompt, auth_headers)))
+        tasks.append(asyncio.create_task(make_request(session, url, prompt, auth_headers, model)))
         await asyncio.sleep(interval)
         
     await asyncio.gather(*tasks)
@@ -118,24 +132,28 @@ async def main():
     prompts = config.get('prompts', ["test"])
     auth_token = config.get('auth_token', '')
     
+    model = config.get('model', 'facebook/opt-125m')
+    
     auth_headers = {}
     if auth_token:
         auth_headers['Authorization'] = f"Bearer {auth_token}"
     
-    print(f"Starting {mode} benchmark for {duration} seconds...")
+    print(f"Starting {mode} benchmark for {duration} seconds with model {model}...")
     
     async with aiohttp.ClientSession() as session:
         if mode == 'closed-loop':
-            await closed_loop(session, url, prompts, config.get('concurrency', 1), duration, auth_headers)
+            await closed_loop(session, url, prompts, config.get('concurrency', 1), duration, auth_headers, model)
         else:
-            await open_loop(session, url, prompts, config.get('target_rps', 1), duration, auth_headers)
+            await open_loop(session, url, prompts, config.get('target_rps', 1), duration, auth_headers, model)
             
     print("Benchmark complete. Metrics server remains active for 10 seconds to scrape.")
     
     # Save results
-    with open('results.json', 'w') as f:
+    timestamp = int(time.time())
+    output_file = f'results_{timestamp}.json'
+    with open(output_file, 'w') as f:
         json.dump(results_log, f, indent=2)
-    print("Saved run metadata to results.json")
+    print(f"Saved run metadata to {output_file}")
     
     await asyncio.sleep(10)
 

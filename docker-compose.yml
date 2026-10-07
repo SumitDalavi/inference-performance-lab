@@ -17,6 +17,10 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./config/grafana/dashboards:/etc/grafana/dashboards
 
   vllm:
     image: vllm/vllm-openai:v0.3.3
