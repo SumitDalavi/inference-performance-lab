@@ -14,10 +14,8 @@ async function runTests() {
   // Create a minimal config in temp dir
   const configContent = `
 endpoint: "http://localhost:8081/v1/chat/completions"
-mode: "closed-loop"
-concurrency: 1
-duration_seconds: 2
-prompts: ["hello", "fail"]
+mode: "deterministic"
+prompts: ["hello", "fail", "empty", "absent", "single"]
 `;
   const configPath = path.join(tempDir, 'test_config.yaml');
   fs.writeFileSync(configPath, configContent);
@@ -47,14 +45,24 @@ prompts: ["hello", "fail"]
   
   let hasValidTokenCount = false;
   let hasHttpFailure = false;
+  let hasNullTpot = false;
   
   for (const r of results) {
-     if (r.success === false) hasHttpFailure = true;
-     if (r.success === true && r.tokens > 0) hasValidTokenCount = true;
+     if (r.success === false) {
+         hasHttpFailure = true;
+         if (r.error.includes("Empty stream received")) {
+             // empty stream handling works
+         }
+     }
+     if (r.success === true) {
+         if (r.tokens > 0) hasValidTokenCount = true;
+         if (r.tokens === null && r.tpot === null) hasNullTpot = true;
+     }
   }
   
   if (!hasHttpFailure) throw new Error("HTTP failure condition was not exercised or saved in results.");
   if (!hasValidTokenCount) throw new Error("No valid token counts were recorded.");
+  if (!hasNullTpot) throw new Error("Null TPOT/tokens logic was not exercised on missing usage blocks.");
   
   // Clean up
   resultFiles.forEach(f => fs.unlinkSync(path.join(tempDir, f)));

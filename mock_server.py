@@ -5,10 +5,11 @@ async def stream_handler(request):
     try:
         data = await request.json()
         prompt = data.get('messages', [{}])[0].get('content', '')
-        if 'fail' in prompt:
-            return web.Response(status=500, text="Simulated Internal Server Error")
     except Exception:
-        pass
+        prompt = ''
+        
+    if 'fail' in prompt:
+        return web.Response(status=500, text="Simulated Internal Server Error")
 
     response = web.StreamResponse(
         status=200,
@@ -21,17 +22,31 @@ async def stream_handler(request):
     )
     await response.prepare(request)
 
-    # Mock TTFT (Time To First Token) delay: 200ms
+    if 'empty' in prompt:
+        # Returns [DONE] immediately with NO choices and NO usage
+        await response.write(b'data: [DONE]\n\n')
+        await response.write_eof()
+        return response
+
+    if 'single' in prompt:
+        await asyncio.sleep(0.1)
+        await response.write(b'data: {"id": "1", "choices": [{"delta": {"content": "One"}}]}\n\n')
+        await response.write(b'data: {"id": "1", "usage": {"completion_tokens": 1}}\n\n')
+        await response.write(b'data: [DONE]\n\n')
+        await response.write_eof()
+        return response
+
+    # Default behaviour (or 'absent')
     await asyncio.sleep(0.2)
     await response.write(b'data: {"id": "1", "choices": [{"delta": {"content": "Hello"}}]}\n\n')
 
-    # Mock ITL (Inter-Token Latency): 45ms per chunk
     for i in range(10):
         await asyncio.sleep(0.045)
         await response.write(b'data: {"id": "1", "choices": [{"delta": {"content": " world"}}]}\n\n')
 
-    # Mock Usage
-    await response.write(b'data: {"id": "1", "usage": {"completion_tokens": 10}}\n\n')
+    if 'absent' not in prompt:
+        await response.write(b'data: {"id": "1", "usage": {"completion_tokens": 11}}\n\n')
+    
     await response.write(b'data: [DONE]\n\n')
     await response.write_eof()
     return response

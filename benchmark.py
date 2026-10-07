@@ -116,6 +116,11 @@ async def open_loop(session, url, prompts, target_rps, duration, auth_headers, m
         
     await asyncio.gather(*tasks)
 
+async def deterministic_loop(session, url, prompts, auth_headers, model):
+    # Executes each prompt exactly once sequentially
+    for prompt in prompts:
+        await make_request(session, url, prompt, auth_headers, model)
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=True)
@@ -146,6 +151,8 @@ async def main():
     async with aiohttp.ClientSession() as session:
         if mode == 'closed-loop':
             await closed_loop(session, url, prompts, config.get('concurrency', 1), duration, auth_headers, model)
+        elif mode == 'deterministic':
+            await deterministic_loop(session, url, prompts, auth_headers, model)
         else:
             await open_loop(session, url, prompts, config.get('target_rps', 1), duration, auth_headers, model)
             
