@@ -1,0 +1,47 @@
+{
+  "metadata": {
+    "config": {
+      "endpoint": "http://localhost:8081/v1/chat/completions",
+      "mode": "closed-loop",
+      "concurrency": 1,
+      "duration_seconds": 2,
+      "prompts": [
+        "hello",
+        "fail"
+      ]
+    },
+    "start_time": 1791363764.3642373,
+    "end_time": 1791363766.4798367,
+    "model": "facebook/opt-125m",
+    "duration": 2
+  },
+  "results": [
+    {
+      "prompt_length": 5,
+      "chunks": 11,
+      "tokens": null,
+      "ttft": 0.20399999999790452,
+      "tpot": null,
+      "e2e": 0.7039999999979045,
+      "success": true
+    },
+    {
+      "prompt_length": 5,
+      "chunks": 11,
+      "tokens": null,
+      "ttft": 0.20299999999406282,
+      "tpot": null,
+      "e2e": 0.7029999999940628,
+      "success": true
+    },
+    {
+      "prompt_length": 4,
+      "chunks": 11,
+      "tokens": null,
+      "ttft": 0.21800000000803266,
+      "tpot": null,
+      "e2e": 0.7180000000080327,
+      "success": true
+    }
+  ]
+}

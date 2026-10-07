@@ -2,6 +2,14 @@ import asyncio
 from aiohttp import web
 
 async def stream_handler(request):
+    try:
+        data = await request.json()
+        prompt = data.get('messages', [{}])[0].get('content', '')
+        if 'fail' in prompt:
+            return web.Response(status=500, text="Simulated Internal Server Error")
+    except Exception:
+        pass
+
     response = web.StreamResponse(
         status=200,
         reason='OK',
@@ -22,6 +30,8 @@ async def stream_handler(request):
         await asyncio.sleep(0.045)
         await response.write(b'data: {"id": "1", "choices": [{"delta": {"content": " world"}}]}\n\n')
 
+    # Mock Usage
+    await response.write(b'data: {"id": "1", "usage": {"completion_tokens": 10}}\n\n')
     await response.write(b'data: [DONE]\n\n')
     await response.write_eof()
     return response

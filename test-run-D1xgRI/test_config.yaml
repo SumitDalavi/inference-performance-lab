@@ -1,0 +1,6 @@
+
+endpoint: "http://localhost:8081/v1/chat/completions"
+mode: "closed-loop"
+concurrency: 1
+duration_seconds: 2
+prompts: ["hello", "fail"]
