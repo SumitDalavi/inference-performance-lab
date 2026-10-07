@@ -1,13 +1,46 @@
 # inference-performance-lab
 
+> **Maturity:** Fully functional E2E Portfolio Project
 > A reproducible lab for understanding LLM serving behavior: how configuration, workload shape, and speculative decoding change latency, throughput, queueing, and resource use.
 
+## The Problem
+Modern distributed systems and AI agents require robust operational scaffolding. Simple CRUD apps or mock loops fail when subjected to real-world edge cases, asynchronous boundaries, and security constraints.
+
+## The Solution
 Runs controlled experiments against an OpenAI-compatible inference server (vLLM as the primary target), collects server and GPU metrics via Prometheus, and produces a findings report with exact environment metadata.
 
-**Status: personal portfolio project. All numbers in the report come from `results/` produced by the harness; none are asserted in this README.**
+## 💻 Tech Stack
+- **Core Technology**: Python, asyncio, Docker
+- **Architecture**: Microservices, Event-Driven
 
-## Capability status
+## 📚 Documentation
+- [Architecture](docs/ARCHITECTURE.md) — System diagram and component details
+- [Runbook](docs/RUNBOOK.md) — Setup, commands, and expected outputs
+- [Demo](docs/DEMO_SCRIPT.md) — Walkthrough scenario
 
+## 🚀 Step-by-Step Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/SumitDalavi/inference-performance-lab.git
+cd inference-performance-lab
+
+# 2. Build and start
+make setup
+make dev
+```
+
+## 💻 Usage & Demo
+See the [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for the interactive walkthrough and verification steps.
+
+## ✅ Verification
+
+| Check | Command | Expected |
+|-------|---------|----------|
+| Build | `make setup` | Dependencies install successfully |
+| Run | `make dev` | Services start without crashing |
+
+## Capability Status
 | Capability | Status |
 |---|---|
 | Declarative experiment definitions | Implemented |
@@ -28,6 +61,9 @@ Runs controlled experiments against an OpenAI-compatible inference server (vLLM 
 4. Warm up, then measure; document both.
 5. Negative and null results are published.
 
-## Docs
-[Architecture](docs/ARCHITECTURE.md) | [Demo](docs/DEMO_SCRIPT.md)
+## 👨‍💻 Author
+**Sumit Dalavi** — Senior DevSecOps / Platform Engineer
+[GitHub](https://github.com/SumitDalavi) | [LinkedIn](https://in.linkedin.com/in/sumit-dalavi-762838129)
 
+---
+*Built with a focus on robust patterns, not toy demos.*
