@@ -1,0 +1,8 @@
+model: mock-vllm
+concurrency: 5
+mode: closed-loop
+duration_seconds: 15
+target_rps: 10
+prompts:
+  - "Hello, what is your name?"
+  - "Summarize the incident report for the checkout service."
