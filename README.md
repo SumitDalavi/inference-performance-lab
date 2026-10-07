@@ -76,3 +76,8 @@ Updated Grafana provisioning paths, configured prometheus.yml scrape targets, an
 
 * Acceptance tests have been upgraded from static string-checks to end-to-end behavioral verifications.
 * API boundaries and execution layers (Docker, WebSockets, Temporal, etc.) are now explicitly exercised in tests.
+
+## Maturity Claims
+- **Implemented (Tested):** Real benchmark data (Llama-3-8B), exact fixture assertions for edge cases, single-token TPOT math handling.
+- **Mocked:** Some stream variations are synthetic to guarantee edge-case coverage in tests.
+- **Deferred:** Multi-node distributed inference benchmarking.
