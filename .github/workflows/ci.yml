@@ -26,4 +26,5 @@ jobs:
       
     - name: Build & Test
       run: |
-        make test || echo "No tests configured yet"
+        make test
+
