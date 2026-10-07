@@ -7,7 +7,8 @@ def analyze(results_file):
     with open(results_file, 'r') as f:
         data = json.load(f)
         
-    df = pd.DataFrame(data)
+    results_list = data.get("results", data) if isinstance(data, dict) else data
+    df = pd.DataFrame(results_list)
     
     if df.empty or 'success' not in df.columns:
         print("No valid data to analyze.")
@@ -38,8 +39,12 @@ def analyze(results_file):
             
     # Throughput
     total_tokens = success_df['tokens'].sum()
-    total_time_span = success_df['e2e'].max()  # Approximation of test duration based on max latency if all started near 0
-    # A better throughput calculation requires start and end timestamps, but this is a rough estimate for the lab
+    total_time_span = 1
+    if isinstance(data, dict) and "metadata" in data:
+        total_time_span = data["metadata"]["end_time"] - data["metadata"]["start_time"]
+    else:
+        total_time_span = success_df['e2e'].max()
+        
     if total_time_span > 0:
         print(f"\nApproximate Throughput: {total_tokens / total_time_span:.2f} tokens/sec")
 

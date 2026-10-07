@@ -67,3 +67,12 @@ See the [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for the interactive walkthrough an
 
 ---
 *Built with a focus on robust patterns, not toy demos.*
+
+
+## October 2026 Update: Behavioral Testing & Runtime Stabilization
+
+**Implementation Notes:**
+Updated Grafana provisioning paths, configured prometheus.yml scrape targets, and implemented behavioral simulation in benchmark.py.
+
+* Acceptance tests have been upgraded from static string-checks to end-to-end behavioral verifications.
+* API boundaries and execution layers (Docker, WebSockets, Temporal, etc.) are now explicitly exercised in tests.

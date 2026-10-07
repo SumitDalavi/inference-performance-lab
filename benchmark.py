@@ -22,7 +22,8 @@ async def make_request(session, url, prompt, auth_headers, model):
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": True,
-        "max_tokens": 100
+        "max_tokens": 100,
+        "stream_options": {"include_usage": True}
     }
     
     try:
@@ -65,8 +66,8 @@ async def make_request(session, url, prompt, auth_headers, model):
                     except json.JSONDecodeError:
                         pass
             
-            if token_count == 0:
-                token_count = chunk_count
+            if chunk_count == 0:
+                raise Exception("Empty stream received")
 
             end_time = time.monotonic()
             e2e = end_time - start_time
@@ -74,7 +75,7 @@ async def make_request(session, url, prompt, auth_headers, model):
             
             tpot = 0
             if token_count > 0:
-                tpot = (end_time - first_chunk_time) / token_count if first_chunk_time else 0
+                tpot = (end_time - first_chunk_time) / max(1, token_count - 1) if first_chunk_time else 0
                 TPOT.observe(tpot)
                 
             REQUESTS.labels(status='success').inc()
@@ -139,6 +140,8 @@ async def main():
         auth_headers['Authorization'] = f"Bearer {auth_token}"
     
     print(f"Starting {mode} benchmark for {duration} seconds with model {model}...")
+    global run_start_time
+    run_start_time = time.time()
     
     async with aiohttp.ClientSession() as session:
         if mode == 'closed-loop':
@@ -148,11 +151,23 @@ async def main():
             
     print("Benchmark complete. Metrics server remains active for 10 seconds to scrape.")
     
+    run_end_time = time.time()
+    
     # Save results
-    timestamp = int(time.time())
+    timestamp = int(run_end_time)
     output_file = f'results_{timestamp}.json'
+    provenance = {
+        "metadata": {
+            "config": config,
+            "start_time": run_start_time,
+            "end_time": run_end_time,
+            "model": model,
+            "duration": duration
+        },
+        "results": results_log
+    }
     with open(output_file, 'w') as f:
-        json.dump(results_log, f, indent=2)
+        json.dump(provenance, f, indent=2)
     print(f"Saved run metadata to {output_file}")
     
     await asyncio.sleep(10)

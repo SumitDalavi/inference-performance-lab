@@ -14,3 +14,21 @@ INF is a benchmarking tool specifically designed for streaming Large Language Mo
    - Exposes detailed histograms (`llm_ttft_seconds`, `llm_itl_seconds`, `llm_e2e_seconds`).
 4. **Observability Stack**:
    - Dockerized Prometheus and Grafana for visualizing benchmark degradation over time.
+
+
+## October 2026 Update: Behavioral Testing & Runtime Stabilization
+
+**Implementation Notes:**
+Updated Grafana provisioning paths, configured prometheus.yml scrape targets, and implemented behavioral simulation in benchmark.py.
+
+* Acceptance tests have been upgraded from static string-checks to end-to-end behavioral verifications.
+* API boundaries and execution layers (Docker, WebSockets, Temporal, etc.) are now explicitly exercised in tests.
+
+
+## Phase 4: Structural Epics & Architectural Roadmap
+
+As part of the project's evolution, several features previously tracked as blockers have been reclassified as **Structural Epics**. These require significant architectural layering and will be implemented in future phases:
+
+* **Epic 1: Advanced Telemetry & Analytics:** Calculation of percentile latencies (p50/p95/p99) and building statistical comparison tooling across multiple experiment runs.
+* **Epic 2: Persistent Dashboards:** Fully automated Grafana dashboard JSON provisioning and long-term Prometheus metrics storage.
+* **Epic 3: Orchestrated Model Binding:** Dynamic configuration binding to automatically spin up, test, and tear down target model containers based on YAML definitions.
