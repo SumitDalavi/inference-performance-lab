@@ -9,18 +9,21 @@ async function runTests() {
   const mockServer = spawn('python', ['mock_server.py']);
   await new Promise(r => setTimeout(r, 2000));
 
-  // Create a minimal config
+  const tempDir = fs.mkdtempSync(path.join(__dirname, 'test-run-'));
+  
+  // Create a minimal config in temp dir
   const configContent = `
 endpoint: "http://localhost:8081/v1/chat/completions"
 mode: "closed-loop"
 concurrency: 1
 duration_seconds: 2
-prompts: ["hello"]
+prompts: ["hello", "fail"]
 `;
-  fs.writeFileSync('test_config.yaml', configContent);
+  const configPath = path.join(tempDir, 'test_config.yaml');
+  fs.writeFileSync(configPath, configContent);
 
-  // Run benchmark
-  const benchmark = spawn('python', ['benchmark.py', '--config', 'test_config.yaml']);
+  // Run benchmark in tempDir
+  const benchmark = spawn('python', [path.join(__dirname, 'benchmark.py'), '--config', configPath], { cwd: tempDir });
   
   await new Promise((resolve, reject) => {
     benchmark.on('close', (code) => {
@@ -30,11 +33,11 @@ prompts: ["hello"]
   });
 
   // Check results
-  const files = fs.readdirSync('.');
+  const files = fs.readdirSync(tempDir);
   const resultFiles = files.filter(f => f.startsWith('results_') && f.endsWith('.json'));
   if (resultFiles.length === 0) throw new Error("No results file generated.");
   
-  const resultData = JSON.parse(fs.readFileSync(resultFiles[0], 'utf8'));
+  const resultData = JSON.parse(fs.readFileSync(path.join(tempDir, resultFiles[0]), 'utf8'));
   
   if (!resultData.metadata) {
       throw new Error("Missing provenance metadata in results.");
@@ -50,9 +53,13 @@ prompts: ["hello"]
      if (r.success === true && r.tokens > 0) hasValidTokenCount = true;
   }
   
+  if (!hasHttpFailure) throw new Error("HTTP failure condition was not exercised or saved in results.");
+  if (!hasValidTokenCount) throw new Error("No valid token counts were recorded.");
+  
   // Clean up
-  resultFiles.forEach(f => fs.unlinkSync(f));
-  fs.unlinkSync('test_config.yaml');
+  resultFiles.forEach(f => fs.unlinkSync(path.join(tempDir, f)));
+  fs.unlinkSync(configPath);
+  fs.rmdirSync(tempDir);
   mockServer.kill();
 
   console.log("✅ Inference Performance Lab passed behavioral tests.");

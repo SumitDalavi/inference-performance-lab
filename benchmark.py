@@ -73,7 +73,7 @@ async def make_request(session, url, prompt, auth_headers, model):
             e2e = end_time - start_time
             E2E_LATENCY.observe(e2e)
             
-            tpot = 0
+            tpot = None
             if token_count > 0:
                 tpot = (end_time - first_chunk_time) / max(1, token_count - 1) if first_chunk_time else 0
                 TPOT.observe(tpot)
@@ -82,7 +82,7 @@ async def make_request(session, url, prompt, auth_headers, model):
             results_log.append({
                 "prompt_length": len(prompt),
                 "chunks": chunk_count,
-                "tokens": token_count,
+                "tokens": token_count if token_count > 0 else None,
                 "ttft": (first_chunk_time - start_time) if first_chunk_time else 0,
                 "tpot": tpot,
                 "e2e": e2e,
