@@ -6,7 +6,7 @@ async function runTests() {
   console.log("Running Behavioral Tests for Inference Performance Lab...");
 
   // Start mock server
-  const mockServer = spawn('python', ['mock_server.py']);
+  const mockServer = spawn('uv', ['run', 'python', 'mock_server.py']);
   await new Promise(r => setTimeout(r, 2000));
 
   const tempDir = fs.mkdtempSync(path.join(__dirname, 'test-run-'));
@@ -21,7 +21,7 @@ prompts: ["hello", "fail", "empty", "absent", "single"]
   fs.writeFileSync(configPath, configContent);
 
   // Run benchmark in tempDir
-  const benchmark = spawn('python', [path.join(__dirname, 'benchmark.py'), '--config', configPath], { cwd: tempDir });
+  const benchmark = spawn('uv', ['run', 'python', path.join(__dirname, 'benchmark.py'), '--config', configPath], { cwd: tempDir, stdio: 'inherit' });
   
   await new Promise((resolve, reject) => {
     benchmark.on('close', (code) => {
