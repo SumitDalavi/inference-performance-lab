@@ -43,26 +43,19 @@ prompts: ["hello", "fail", "empty", "absent", "single"]
   
   const results = resultData.results;
   
-  let hasValidTokenCount = false;
-  let hasHttpFailure = false;
-  let hasNullTpot = false;
+  if (results.length !== 5) throw new Error("Expected 5 results");
   
-  for (const r of results) {
-     if (r.success === false) {
-         hasHttpFailure = true;
-         if (r.error.includes("Empty stream received")) {
-             // empty stream handling works
-         }
-     }
-     if (r.success === true) {
-         if (r.tokens > 0) hasValidTokenCount = true;
-         if (r.tokens === null && r.tpot === null) hasNullTpot = true;
-     }
-  }
-  
-  if (!hasHttpFailure) throw new Error("HTTP failure condition was not exercised or saved in results.");
-  if (!hasValidTokenCount) throw new Error("No valid token counts were recorded.");
-  if (!hasNullTpot) throw new Error("Null TPOT/tokens logic was not exercised on missing usage blocks.");
+  const helloResult = results[0];
+  const failResult = results[1];
+  const emptyResult = results[2];
+  const absentResult = results[3];
+  const singleResult = results[4];
+
+  if (helloResult.tokens !== 11) throw new Error("hello request did not record exactly 11 tokens");
+  if (failResult.success !== false) throw new Error("fail request did not fail");
+  if (emptyResult.success !== false || !emptyResult.error.includes("Empty stream received")) throw new Error("empty request did not fail with empty stream error");
+  if (absentResult.tokens !== null || absentResult.tpot !== null) throw new Error("absent request did not record null tokens and TPOT");
+  if (singleResult.tokens !== 1 || singleResult.tpot !== null) throw new Error("single request did not record 1 token and null TPOT");
   
   // Clean up
   resultFiles.forEach(f => fs.unlinkSync(path.join(tempDir, f)));

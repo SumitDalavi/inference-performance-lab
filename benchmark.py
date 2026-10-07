@@ -74,8 +74,8 @@ async def make_request(session, url, prompt, auth_headers, model):
             E2E_LATENCY.observe(e2e)
             
             tpot = None
-            if token_count > 0:
-                tpot = (end_time - first_chunk_time) / max(1, token_count - 1) if first_chunk_time else 0
+            if token_count > 1:
+                tpot = (end_time - first_chunk_time) / (token_count - 1) if first_chunk_time else 0
                 TPOT.observe(tpot)
                 
             REQUESTS.labels(status='success').inc()
