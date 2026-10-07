@@ -1,3 +1,12 @@
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+venv/
+ENV/
+env/
+.env
+*.log
 
 # Planning & Walkthrough Docs
 EXECUTION_MASTER.md
@@ -5,3 +14,4 @@ PROJECT_STATUS.yaml
 IMPLEMENTATION_PLAN_PHASE2_E2E.md
 docs/WALKTHROUGH.md
 WALKTHROUGH.md
+
