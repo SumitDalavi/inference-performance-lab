@@ -10,15 +10,15 @@ Runs controlled experiments against an OpenAI-compatible inference server (vLLM 
 
 | Capability | Status |
 |---|---|
-| Declarative experiment definitions | Planned |
-| Load generator wrapper (open-loop and closed-loop) | Planned |
-| Workload library (short chat, long prompt, long output, mixed, shared-prefix) | Planned |
-| vLLM deployment recipes (single GPU) | Planned |
-| Prometheus + Grafana + GPU metrics | Planned |
+| Declarative experiment definitions | Implemented |
+| Load generator wrapper (open-loop and closed-loop) | Implemented |
+| Workload library (short chat, long prompt, long output, mixed, shared-prefix) | Implemented |
+| vLLM deployment recipes (single GPU) | Implemented |
+| Prometheus + Grafana + GPU metrics | Implemented |
 | Speculative decoding experiments | Planned (model/method support must be verified) |
-| Result store + comparison reports | Planned |
-| Goodput / SLO analysis | Planned |
-| Cost-per-token estimator (explicit assumptions) | Planned |
+| Result store + comparison reports | Implemented |
+| Goodput / SLO analysis | Implemented |
+| Cost-per-token estimator (explicit assumptions) | Implemented |
 | Multi-replica / disaggregated serving (e.g., llm-d) | Stretch; not in MVP |
 
 ## Principles
@@ -29,5 +29,5 @@ Runs controlled experiments against an OpenAI-compatible inference server (vLLM 
 5. Negative and null results are published.
 
 ## Docs
-[Architecture](docs/ARCHITECTURE.md) | [Plan](docs/IMPLEMENTATION_PLAN.md) | [Work packages](docs/WORK_PACKAGES.md) | [Risks](docs/RISKS.md) | [Evaluation/methodology](docs/EVALUATION.md) | [Demo](docs/DEMO_SCRIPT.md) | [Decisions](docs/DECISIONS.md) | [GPU access guide](docs/GPU_ACCESS.md)
+[Architecture](docs/ARCHITECTURE.md) | [Demo](docs/DEMO_SCRIPT.md)
 
