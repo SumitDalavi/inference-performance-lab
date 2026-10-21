@@ -7,6 +7,9 @@ ENV/
 env/
 .env
 *.log
+dist/
+build/
+*.egg-info/
 
 # Planning & Walkthrough Docs
 EXECUTION_MASTER.md
