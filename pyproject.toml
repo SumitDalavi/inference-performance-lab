@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inference-performance-lab"
+version = "0.1.0"
+description = "Benchmarking and profiling suite for LLM inference serving measuring TTFT, ITL, and throughput"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Sumit Dalavi", email = "sumitdalavi@users.noreply.github.com" }
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "aiohttp>=3.9.0",
+  "prometheus_client>=0.20.0",
+  "pyyaml>=6.0.1",
+  "requests>=2.31.0"
+]
