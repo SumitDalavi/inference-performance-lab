@@ -132,13 +132,14 @@ async def main():
     start_http_server(8000)
     print("Prometheus metrics available on port 8000")
     
-    url = config.get('endpoint', "http://localhost:8080/v1/chat/completions")
-    mode = config.get('mode', 'closed-loop')
-    duration = config.get('duration_seconds', 10)
+    import os
+    endpoint_env = os.environ.get('INFERENCE_ENDPOINT')
+    url = endpoint_env or config.get('endpoint', "http://localhost:8080/v1/chat/completions")
+    mode = os.environ.get('BENCHMARK_MODE') or config.get('mode', 'closed-loop')
+    duration = int(os.environ.get('BENCHMARK_DURATION') or config.get('duration_seconds', 10))
     prompts = config.get('prompts', ["test"])
-    auth_token = config.get('auth_token', '')
-    
-    model = config.get('model', 'facebook/opt-125m')
+    auth_token = os.environ.get('INFERENCE_AUTH_TOKEN') or config.get('auth_token', '')
+    model = os.environ.get('INFERENCE_MODEL') or config.get('model', 'facebook/opt-125m')
     
     auth_headers = {}
     if auth_token:

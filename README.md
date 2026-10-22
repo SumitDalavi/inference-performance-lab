@@ -6,7 +6,6 @@
 [![SBOM](https://img.shields.io/badge/SBOM-SPDX%202.3-blueviolet?logo=spdx)](https://github.com/SumitDalavi/inference-performance-lab/releases/tag/v0.2.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-> **Maturity:** Fully functional E2E Portfolio Project  
 > Distributed via GitHub Container Registry (`ghcr.io/sumitdalavi/inference-performance-lab:v0.2.0`) and tagged GitHub Releases with Anchore SPDX 2.3 SBOM and SHA-256 digest attestation.
 
 ---
@@ -123,18 +122,17 @@ cat sbom.spdx.json | jq .spdxVersion
 
 ---
 
-## October 2026 Update: Behavioral Testing & Runtime Stabilization
+## 🔌 Dual-Mode Execution: Live-First with Graceful Mock Fallback
 
-**Implementation Notes:**
-Updated Grafana provisioning paths, configured prometheus.yml scrape targets, and implemented behavioral simulation in benchmark.py.
+This platform operates in **Dual-Mode**, dynamically selecting between live LLM inference servers and embedded streaming simulators based on environment variables:
 
-* Acceptance tests have been upgraded from static string-checks to end-to-end behavioral verifications.
-* API boundaries and execution layers (Docker, WebSockets, Temporal, etc.) are now explicitly exercised in tests.
+| Component | Environment Variable | Live Mode Behavior | Fallback Mode (Unset / Empty) |
+|---|---|---|---|
+| **Inference Server** | `INFERENCE_ENDPOINT` | Streams tokens from live vLLM, Ollama, TGI, or OpenAI-compatible endpoint | Binds to bundled FastAPI streaming simulation harness on port `8080` |
+| **Serving Model** | `INFERENCE_MODEL` | Requests specific target model (e.g. `meta-llama/Llama-3-8B-Instruct`) | Defaults to lightweight test model identifier (`facebook/opt-125m`) |
+| **Authentication** | `INFERENCE_AUTH_TOKEN` | Injects Authorization Bearer header for protected cloud endpoints | Runs unauthenticated against local test servers |
+| **Metrics Collector** | `PROMETHEUS_PORT` | Exposes metrics on custom port for Prometheus scrape scraping | Binds metrics exporter to default port `8000` |
 
-## Maturity Claims
-- **Implemented (Tested):** Real benchmark data (Llama-3-8B), exact fixture assertions for edge cases, single-token TPOT math handling.
-- **Mocked:** Some stream variations are synthetic to guarantee edge-case coverage in tests.
-- **Deferred:** Multi-node distributed inference benchmarking.
 
 ---
 
@@ -142,4 +140,7 @@ Updated Grafana provisioning paths, configured prometheus.yml scrape targets, an
 **Sumit Dalavi** — Senior DevSecOps / Platform Engineer  
 [GitHub](https://github.com/SumitDalavi) | [LinkedIn](https://in.linkedin.com/in/sumit-dalavi-762838129)
 
-*Built with a focus on robust patterns, not toy demos.*
+---
+
+## 📄 License
+This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Sumit Dalavi.

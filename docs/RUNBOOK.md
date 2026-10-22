@@ -27,16 +27,6 @@ If `make dev` fails due to bound ports, verify that no local Prometheus or Grafa
 **Build Errors:**
 Run `make clean && make setup` to completely clear the cache and reinstall dependencies from scratch.
 
-
-## October 2026 Update: Behavioral Testing & Runtime Stabilization
-
-**Implementation Notes:**
-Updated Grafana provisioning paths, configured prometheus.yml scrape targets, and implemented behavioral simulation in benchmark.py.
-
-* Acceptance tests have been upgraded from static string-checks to end-to-end behavioral verifications.
-* API boundaries and execution layers (Docker, WebSockets, Temporal, etc.) are now explicitly exercised in tests.
-
-
 ## Phase 4: Structural Epics & Architectural Roadmap
 
 As part of the project's evolution, several features previously tracked as blockers have been reclassified as **Structural Epics**. These require significant architectural layering and will be implemented in future phases:
@@ -44,7 +34,6 @@ As part of the project's evolution, several features previously tracked as block
 * **Epic 1: Advanced Telemetry & Analytics:** Calculation of percentile latencies (p50/p95/p99) and building statistical comparison tooling across multiple experiment runs.
 * **Epic 2: Persistent Dashboards:** Fully automated Grafana dashboard JSON provisioning and long-term Prometheus metrics storage.
 * **Epic 3: Orchestrated Model Binding:** Dynamic configuration binding to automatically spin up, test, and tear down target model containers based on YAML definitions.
-
 
 ## Phase 5: Final Correctness & Behavioral Test Hardening (Completed)
 All identified correctness blockers from the initial structural epic phase have been addressed:
@@ -57,7 +46,6 @@ This resolves all behavioral and runtime constraints, ensuring robust CI/CD exec
 ## Phase 6: E2E Assurance & Metric Correctness (Final Validation)
 - **Real Backend Verification**: The framework now supports verification against real external generation APIs, fully parsing the SSE stream and asserting that measured Time-To-First-Token (TTFT) and Inter-Token-Latency (ITL) meet strict numeric thresholds.
 - **Performance Anomaly Rejection**: Introduced strict finite-value validation (`NaN`, `Infinity`, negatives). Instead of failing tests due to intermittent cloud spikes, the lab intelligently flags latency regressions as structural performance anomalies (`inconclusive` or non-optimal E2E output), maintaining strict test framework stability while correctly auditing the target model's throughput.
-
 
 ## Production Operations & Release Runbook (v0.2.0 Update)
 
