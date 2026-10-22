@@ -133,7 +133,6 @@ This platform operates in **Dual-Mode**, dynamically selecting between live LLM 
 | **Authentication** | `INFERENCE_AUTH_TOKEN` | Injects Authorization Bearer header for protected cloud endpoints | Runs unauthenticated against local test servers |
 | **Metrics Collector** | `PROMETHEUS_PORT` | Exposes metrics on custom port for Prometheus scrape scraping | Binds metrics exporter to default port `8000` |
 
-
 ---
 
 ## 👨‍💻 Author
